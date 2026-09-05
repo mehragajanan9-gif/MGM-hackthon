@@ -1,0 +1,431 @@
+{% extends "base.html" %}
+
+{% block title %}
+Complaint #{{ complaint.id }} - JanSahayak AI
+{% endblock %}
+
+{% block content %}
+
+<div class="detail-page">
+
+
+<!-- ========================= -->
+<!-- HEADER -->
+<!-- ========================= -->
+
+<div class="detail-header">
+
+    <div>
+
+        <div class="badge">
+            COMPLAINT #{{ complaint.id }}
+        </div>
+
+        <h1>
+            {{ complaint.title }}
+        </h1>
+
+        <p>
+            Submitted on
+            {{ complaint.created_at|date:"d M Y, h:i A" }}
+        </p>
+
+    </div>
+
+
+    {% if complaint.is_emergency %}
+
+        <div class="emergency-alert">
+            🚨 EMERGENCY
+        </div>
+
+    {% endif %}
+
+</div>
+
+
+
+<!-- ========================= -->
+<!-- COMPLAINT DETAILS + AI -->
+<!-- ========================= -->
+
+<div class="detail-grid">
+
+
+    <!-- COMPLAINT INFORMATION -->
+
+    <div class="detail-card">
+
+        <h2>
+            Complaint Information
+        </h2>
+
+
+        <div class="detail-item">
+
+            <span>
+                Description
+            </span>
+
+            <strong>
+                {{ complaint.description }}
+            </strong>
+
+        </div>
+
+
+        <div class="detail-item">
+
+            <span>
+                Location
+            </span>
+
+            <strong>
+                📍 {{ complaint.location|default:"Location not available" }}
+            </strong>
+
+        </div>
+
+
+        {% if complaint.latitude and complaint.longitude %}
+
+            <div class="detail-item">
+
+                <span>
+                    Coordinates
+                </span>
+
+                <strong>
+                    {{ complaint.latitude }},
+                    {{ complaint.longitude }}
+                </strong>
+
+            </div>
+
+        {% endif %}
+
+
+        {% if complaint.image %}
+
+            <div class="detail-image">
+
+                <img
+                    src="{{ complaint.image.url }}"
+                    alt="Complaint image for {{ complaint.title }}">
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+
+
+    <!-- AI ANALYSIS -->
+
+    <div class="detail-card">
+
+        <h2>
+            🤖 AI Analysis
+        </h2>
+
+
+        <div class="ai-detail">
+
+            <span>
+                Category
+            </span>
+
+            <strong>
+                {{ complaint.get_category_display|default:"Not classified" }}
+            </strong>
+
+        </div>
+
+
+        <div class="ai-detail">
+
+            <span>
+                Priority
+            </span>
+
+            <strong class="priority-{{ complaint.priority|lower }}">
+                {{ complaint.get_priority_display|default:"Normal" }}
+            </strong>
+
+        </div>
+
+
+        <div class="ai-detail">
+
+            <span>
+                Department
+            </span>
+
+            <strong>
+                {{ complaint.department|default:"Not assigned" }}
+            </strong>
+
+        </div>
+
+
+        <div class="ai-detail">
+
+            <span>
+                Emergency
+            </span>
+
+            <strong>
+
+                {% if complaint.is_emergency %}
+
+                    🚨 YES
+
+                {% else %}
+
+                    ✅ NO
+
+                {% endif %}
+
+            </strong>
+
+        </div>
+
+
+        <div class="ai-detail">
+
+            <span>
+                Current Status
+            </span>
+
+            <strong class="status-{{ complaint.status }}">
+
+                {{ complaint.get_status_display|default:complaint.status }}
+
+            </strong>
+
+        </div>
+
+
+        {% if complaint.ai_summary %}
+
+            <div class="summary">
+
+                <strong>
+                    AI Summary
+                </strong>
+
+                <p>
+                    {{ complaint.ai_summary }}
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+
+<!-- ========================= -->
+<!-- COMPLAINT TIMELINE -->
+<!-- ========================= -->
+
+<div class="timeline-card">
+
+    <h2>
+        Complaint Status
+    </h2>
+
+
+    <div class="timeline">
+
+
+        <!-- STEP 1: SUBMITTED -->
+
+        <div class="timeline-item active">
+
+            <div class="timeline-dot">
+                ✓
+            </div>
+
+            <div>
+
+                <strong>
+                    Submitted
+                </strong>
+
+                <p>
+                    Complaint successfully received
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- STEP 2: AI ANALYSED -->
+
+        <div class="timeline-item active">
+
+            <div class="timeline-dot">
+                ✓
+            </div>
+
+            <div>
+
+                <strong>
+                    AI Analysed
+                </strong>
+
+                <p>
+                    AI classified category, priority and department
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- STEP 3: ASSIGNED -->
+
+        <div class="timeline-item active
+            {% if complaint.status == 'assigned' or complaint.status == 'progress' or complaint.status == 'resolved' or complaint.status == 'closed' %}
+                active
+            {% endif %}">
+
+            <div class="timeline-dot">
+
+                {% if complaint.status == 'assigned' or complaint.status == 'progress' or complaint.status == 'resolved' or complaint.status == 'closed' %}
+                    ✓
+                {% else %}
+                    3
+                {% endif %}
+
+            </div>
+
+            <div>
+
+                <strong>
+                    Assigned
+                </strong>
+
+                <p>
+                    Complaint assigned to responsible department
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- STEP 4: IN PROGRESS -->
+
+        <div class="timeline-item active
+            {% if complaint.status == 'progress' or complaint.status == 'resolved' or complaint.status == 'closed' %}
+                active
+            {% endif %}">
+
+            <div class="timeline-dot">
+
+                {% if complaint.status == 'progress' or complaint.status == 'resolved' or complaint.status == 'closed' %}
+                    ✓
+                {% else %}
+                    4
+                {% endif %}
+
+            </div>
+
+            <div>
+
+                <strong>
+                    In Progress
+                </strong>
+
+                <p>
+                    Officer or department is working on the issue
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- STEP 5: RESOLVED -->
+
+        <div class="timeline-item
+            {% if complaint.status == 'resolved' or complaint.status == 'closed' %}
+                active
+            {% endif %}">
+
+            <div class="timeline-dot">
+
+                {% if complaint.status == 'resolved' or complaint.status == 'closed' %}
+                    ✓
+                {% else %}
+                    5
+                {% endif %}
+
+            </div>
+
+            <div>
+
+                <strong>
+                    Resolved
+                </strong>
+
+                <p>
+                    The reported issue has been resolved
+                </p>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+
+<!-- ========================= -->
+<!-- BACK BUTTON -->
+<!-- ========================= -->
+
+<div style="margin-top: 25px;">
+
+    {% if user.is_staff %}
+
+        <a
+            href="{% url 'admin_dashboard' %}"
+            class="btn">
+
+            ← Back to Admin Dashboard
+
+        </a>
+
+    {% else %}
+
+        <a
+            href="{% url 'dashboard' %}"
+            class="btn">
+
+            ← Back to Dashboard
+
+        </a>
+
+    {% endif %}
+
+</div>
+
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block title %}
+Register - JanSahayak AI
+{% endblock %}
+
+{% block content %}
+
+<div class="auth-container">
+
+
+<div class="auth-card">
+
+
+    <!-- ========================= -->
+    <!-- HEADER -->
+    <!-- ========================= -->
+
+    <div class="auth-icon">
+        👤
+    </div>
+
+
+    <h1>
+        Create Account
+    </h1>
+
+
+    <p>
+        Join JanSahayak AI and report public issues.
+    </p>
+
+
+
+    <!-- ========================= -->
+    <!-- FORM ERRORS -->
+    <!-- ========================= -->
+
+    {% if form.errors %}
+
+        <div class="form-errors">
+
+            <strong>
+                Please fix the following errors:
+            </strong>
+
+
+            {% for field in form %}
+
+                {% for error in field.errors %}
+
+                    <p>
+                        {{ field.label }}: {{ error }}
+                    </p>
+
+                {% endfor %}
+
+            {% endfor %}
+
+
+            {% for error in form.non_field_errors %}
+
+                <p>
+                    {{ error }}
+                </p>
+
+            {% endfor %}
+
+        </div>
+
+    {% endif %}
+
+
+
+    <!-- ========================= -->
+    <!-- REGISTRATION FORM -->
+    <!-- ========================= -->
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+
+        <!-- USERNAME -->
+
+        <div class="form-group">
+
+            <label for="{{ form.username.id_for_label }}">
+                Username
+            </label>
+
+            {{ form.username }}
+
+        </div>
+
+
+
+        <!-- EMAIL -->
+
+        <div class="form-group">
+
+            <label for="{{ form.email.id_for_label }}">
+                Email
+            </label>
+
+            {{ form.email }}
+
+        </div>
+
+
+
+        <!-- PHONE -->
+
+        <div class="form-group">
+
+            <label for="{{ form.phone.id_for_label }}">
+                Phone Number
+            </label>
+
+            {{ form.phone }}
+
+        </div>
+
+
+
+        <!-- PASSWORD -->
+
+        <div class="form-group">
+
+            <label for="{{ form.password1.id_for_label }}">
+                Password
+            </label>
+
+            {{ form.password1 }}
+
+        </div>
+
+
+
+        <!-- CONFIRM PASSWORD -->
+
+        <div class="form-group">
+
+            <label for="{{ form.password2.id_for_label }}">
+                Confirm Password
+            </label>
+
+            {{ form.password2 }}
+
+        </div>
+
+
+
+        <!-- SUBMIT -->
+
+        <button
+            type="submit"
+            class="btn primary full">
+
+            Create Account
+
+        </button>
+
+
+    </form>
+
+
+
+    <!-- ========================= -->
+    <!-- LOGIN LINK -->
+    <!-- ========================= -->
+
+    <p class="auth-footer">
+
+        Already have an account?
+
+        <a href="{% url 'login' %}">
+            Login
+        </a>
+
+    </p>
+
+
+</div>
+
+
+</div>
+
+{% endblock %}

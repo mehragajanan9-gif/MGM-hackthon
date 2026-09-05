@@ -1,0 +1,638 @@
+{% extends "base.html" %}
+
+{% block title %}
+Report Issue - JanSahayak AI
+{% endblock %}
+
+{% block content %}
+
+<div class="form-page">
+
+
+<div class="form-header">
+    <div class="badge">
+        PUBLIC GRIEVANCE
+    </div>
+
+    <h1>Report a Problem</h1>
+
+    <p>
+        Provide details about the issue.
+        Our AI will analyse it and recommend
+        the appropriate department.
+    </p>
+</div>
+
+
+<form method="POST"
+      enctype="multipart/form-data"
+      class="complaint-form">
+
+    {% csrf_token %}
+
+
+    <!-- ========================= -->
+    <!-- COMPLAINT DETAILS -->
+    <!-- ========================= -->
+
+    <div class="form-section">
+
+        <h2>📝 Complaint Details</h2>
+
+
+        <div class="form-group">
+
+            <label for="{{ form.title.id_for_label }}">
+                Complaint Title
+            </label>
+
+            {{ form.title }}
+
+            {% if form.title.errors %}
+                <div class="form-error">
+                    {{ form.title.errors }}
+                </div>
+            {% endif %}
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="{{ form.description.id_for_label }}">
+                Description
+            </label>
+
+            {{ form.description }}
+
+            {% if form.description.errors %}
+                <div class="form-error">
+                    {{ form.description.errors }}
+                </div>
+            {% endif %}
+
+        </div>
+
+
+        <div class="form-group">
+
+                <label for="{{ form.image.id_for_label }}">
+                    📷 Complaint Image
+                </label>
+
+                {{ form.image }}
+
+                <small>
+                    Upload a photo showing the problem, or take a live
+                    photo using your camera.
+                </small>
+
+
+                <!-- CAMERA BUTTON -->
+
+                <!-- LIVE CAMERA SECTION -->
+
+<button
+    type="button"
+    class="camera-button"
+    onclick="openCamera()"
+>
+    📷 Open Live Camera
+</button>
+
+<br><br>
+
+<video
+    id="cameraPreview"
+    autoplay
+    playsinline
+    style="display:none; width:100%; max-width:500px; border-radius:10px;"
+></video>
+
+<br>
+
+<button
+    type="button"
+    id="captureButton"
+    class="btn secondary"
+    style="display:none;"
+    onclick="capturePhoto()"
+>
+    📸 Capture Photo
+</button>
+
+<canvas
+    id="cameraCanvas"
+    style="display:none;"
+></canvas>
+
+<input
+    type="hidden"
+    id="capturedImage"
+    name="captured_image"
+>
+
+
+                <!-- IMAGE PREVIEW -->
+
+                <div id="imagePreviewContainer"
+                     style="display:none; margin-top:15px;">
+
+                    <p>
+                        <strong>Selected Image:</strong>
+                    </p>
+
+                    <img id="imagePreview"
+                         src=""
+                         alt="Complaint Preview">
+
+                </div>
+
+
+                {% if form.image.errors %}
+
+                    <div class="form-error">
+                        {{ form.image.errors }}
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>  
+
+    <!-- ========================= -->
+    <!-- LOCATION -->
+    <!-- ========================= -->
+
+    <div class="form-section">
+
+        <h2>📍 Location</h2>
+
+
+        <div class="form-group">
+
+            <label for="{{ form.location.id_for_label }}">
+                Location
+            </label>
+
+            {{ form.location }}
+
+            {% if form.location.errors %}
+                <div class="form-error">
+                    {{ form.location.errors }}
+                </div>
+            {% endif %}
+
+
+            <p id="locationDisplay">
+                📍 Location not detected
+            </p>
+
+        </div>
+
+
+        <button
+            type="button"
+            class="location-button"
+            onclick="getLocation()">
+
+            📍 Use My Current Location
+
+        </button>
+
+
+        <!-- Hidden Latitude -->
+        {{ form.latitude }}
+
+        <!-- Hidden Longitude -->
+        {{ form.longitude }}
+
+
+        <p
+            id="location-message"
+            class="location-message">
+        </p>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- AI INFORMATION -->
+    <!-- ========================= -->
+
+    <div class="ai-info">
+
+        <div>
+            🤖
+        </div>
+
+        <div>
+
+            <strong>
+                AI Analysis
+            </strong>
+
+            <p>
+                After submission, JanSahayak AI will
+                analyse your complaint to determine
+                category, priority, emergency status
+                and responsible department.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- SUBMIT BUTTON -->
+    <!-- ========================= -->
+
+    <button
+        type="submit"
+        class="btn primary full">
+
+        🚀 Submit Complaint
+
+    </button>
+
+</form>
+
+
+</div>
+
+<script>
+
+function getLocation() {
+
+    const message = document.getElementById(
+        "location-message"
+    );
+
+    message.innerText =
+        "Detecting your location...";
+
+    if (navigator.geolocation) {
+
+        navigator.geolocation.getCurrentPosition(
+
+            showPosition,
+
+            showError,
+
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
+            }
+
+        );
+
+    } else {
+
+        message.innerText =
+            "Geolocation is not supported by this browser.";
+
+    }
+
+}
+
+
+function showPosition(position) {
+
+    const lat = position.coords.latitude;
+
+    const lon = position.coords.longitude;
+
+
+    // Save latitude
+    const latitudeField =
+        document.getElementById("id_latitude");
+
+    // Save longitude
+    const longitudeField =
+        document.getElementById("id_longitude");
+
+
+    if (latitudeField) {
+        latitudeField.value = lat;
+    }
+
+
+    if (longitudeField) {
+        longitudeField.value = lon;
+    }
+
+
+    document.getElementById(
+        "locationDisplay"
+    ).innerText =
+        `📍 Latitude: ${lat.toFixed(6)}, Longitude: ${lon.toFixed(6)}`;
+
+
+    document.getElementById(
+        "location-message"
+    ).innerText =
+        "Fetching location address...";
+
+
+    // Reverse Geocoding using OpenStreetMap Nominatim
+
+    fetch(
+        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`
+    )
+
+    .then(response => {
+
+        if (!response.ok) {
+            throw new Error(
+                "Unable to fetch location details."
+            );
+        }
+
+        return response.json();
+
+    })
+
+    .then(data => {
+
+        const locationField =
+            document.getElementById("id_location");
+
+
+        if (data && data.display_name) {
+
+            document.getElementById(
+                "locationDisplay"
+            ).innerText =
+                "📍 " + data.display_name;
+
+
+            if (locationField) {
+
+                locationField.value =
+                    data.display_name;
+
+            }
+
+
+            document.getElementById(
+                "location-message"
+            ).innerText =
+                "Location detected successfully ✅";
+
+        }
+
+        else {
+
+            document.getElementById(
+                "location-message"
+            ).innerText =
+                "Coordinates detected successfully.";
+
+        }
+
+    })
+
+    .catch(error => {
+
+        console.error(
+            "Location API Error:",
+            error
+        );
+
+
+        document.getElementById(
+            "location-message"
+        ).innerText =
+            "Coordinates detected, but address could not be fetched.";
+
+    });
+
+}
+
+
+function showError(error) {
+
+    const message =
+        document.getElementById(
+            "location-message"
+        );
+
+    switch (error.code) {
+
+        case error.PERMISSION_DENIED:
+
+            message.innerText =
+                "Location permission was denied.";
+
+            break;
+
+        case error.POSITION_UNAVAILABLE:
+
+            message.innerText =
+                "Location information is unavailable.";
+
+            break;
+
+        case error.TIMEOUT:
+
+            message.innerText =
+                "Location request timed out.";
+
+            break;
+
+        default:
+
+            message.innerText =
+                "Unable to retrieve your location.";
+
+    }
+
+}
+
+
+/* ========================= */
+/* LIVE CAMERA FUNCTION */
+/* ========================= */
+
+let cameraStream = null;
+
+
+function openCamera() {
+
+    const video =
+        document.getElementById("cameraPreview");
+
+    const captureButton =
+        document.getElementById("captureButton");
+
+
+    if (!navigator.mediaDevices ||
+        !navigator.mediaDevices.getUserMedia) {
+
+        alert(
+            "Camera is not supported by this browser."
+        );
+
+        return;
+    }
+
+
+    navigator.mediaDevices.getUserMedia({
+
+        video: {
+            facingMode: {
+                ideal: "environment"
+            }
+        },
+
+        audio: false
+
+    })
+
+    .then(function(stream) {
+
+        cameraStream = stream;
+
+        video.srcObject = stream;
+
+        video.style.display = "block";
+
+        captureButton.style.display = "inline-block";
+
+    })
+
+    .catch(function(error) {
+
+        console.error(
+            "Camera Error:",
+            error
+        );
+
+        alert(
+            "Unable to access camera. Please allow camera permission."
+        );
+
+    });
+
+}
+
+
+/* ========================= */
+/* CAPTURE PHOTO FUNCTION */
+/* ========================= */
+
+function capturePhoto() {
+
+    const video =
+        document.getElementById("cameraPreview");
+
+    const canvas =
+        document.getElementById("cameraCanvas");
+
+    const capturedImage =
+        document.getElementById("capturedImage");
+
+
+    if (!video.videoWidth ||
+        !video.videoHeight) {
+
+        alert(
+            "Camera is still loading. Please wait a moment."
+        );
+
+        return;
+    }
+
+
+    canvas.width =
+        video.videoWidth;
+
+    canvas.height =
+        video.videoHeight;
+
+
+    const context =
+        canvas.getContext("2d");
+
+
+    context.drawImage(
+        video,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    const imageData =
+        canvas.toDataURL(
+            "image/jpeg",
+            0.9
+        );
+
+
+    capturedImage.value =
+        imageData;
+
+
+    /* SHOW IMAGE PREVIEW */
+
+    const preview =
+        document.getElementById("imagePreview");
+
+    const previewContainer =
+        document.getElementById(
+            "imagePreviewContainer"
+        );
+
+
+    preview.src =
+        imageData;
+
+    previewContainer.style.display =
+        "block";
+
+
+    alert(
+        "Live photo captured successfully!"
+    );
+
+
+    /* STOP CAMERA */
+
+    if (cameraStream) {
+
+        cameraStream
+            .getTracks()
+            .forEach(function(track) {
+
+                track.stop();
+
+            });
+
+        cameraStream = null;
+
+    }
+
+
+    video.srcObject =
+        null;
+
+    video.style.display =
+        "none";
+
+
+    document.getElementById(
+        "captureButton"
+    ).style.display =
+        "none";
+
+}
+
+
+</script>
+
+{% endblock %}

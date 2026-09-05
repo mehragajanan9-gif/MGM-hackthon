@@ -1,0 +1,337 @@
+{% extends "base.html" %}
+
+{% block title %}
+Dashboard - JanSahayak AI
+{% endblock %}
+
+{% block content %}
+
+<section class="dashboard">
+
+
+<!-- ========================= -->
+<!-- DASHBOARD HEADER -->
+<!-- ========================= -->
+
+<div class="dashboard-header">
+
+    <div>
+
+        <div class="badge">
+            CITIZEN DASHBOARD
+        </div>
+
+        <h1>
+            Hello, {{ user.username }} 👋
+        </h1>
+
+        <p>
+            Track and manage your public grievances.
+        </p>
+
+    </div>
+
+
+    <a
+        href="{% url 'create_complaint' %}"
+        class="btn primary">
+
+        + Report New Issue
+
+    </a>
+
+</div>
+
+
+
+<!-- ========================= -->
+<!-- STATISTICS -->
+<!-- ========================= -->
+
+<div class="stats-grid">
+
+
+    <div class="stat-card">
+
+        <div class="stat-icon">
+            📋
+        </div>
+
+        <div>
+
+            <span>
+                Total Complaints
+            </span>
+
+            <strong>
+                {{ total|default:0 }}
+            </strong>
+
+        </div>
+
+    </div>
+
+
+
+    <div class="stat-card">
+
+        <div class="stat-icon">
+            ⏳
+        </div>
+
+        <div>
+
+            <span>
+                Pending
+            </span>
+
+            <strong>
+                {{ pending|default:0 }}
+            </strong>
+
+        </div>
+
+    </div>
+
+
+
+    <div class="stat-card">
+
+        <div class="stat-icon">
+            ✅
+        </div>
+
+        <div>
+
+            <span>
+                Resolved
+            </span>
+
+            <strong>
+                {{ resolved|default:0 }}
+            </strong>
+
+        </div>
+
+    </div>
+
+
+
+    <div class="stat-card emergency-card">
+
+        <div class="stat-icon">
+            🚨
+        </div>
+
+        <div>
+
+            <span>
+                Emergency
+            </span>
+
+            <strong>
+                {{ emergency|default:0 }}
+            </strong>
+
+        </div>
+
+    </div>
+
+
+</div>
+
+
+
+<!-- ========================= -->
+<!-- COMPLAINT SECTION -->
+<!-- ========================= -->
+
+<div class="section-header">
+
+    <h2>
+        My Complaints
+    </h2>
+
+</div>
+
+
+
+{% if complaints %}
+
+
+    <div class="complaints-list">
+
+
+        {% for complaint in complaints %}
+
+
+            <a
+                href="{% url 'complaint_detail' complaint.id %}"
+                class="complaint-card">
+
+
+                <!-- COMPLAINT INFORMATION -->
+
+                <div class="complaint-main">
+
+
+                    <div class="complaint-number">
+
+                        #{{ complaint.id }}
+
+                    </div>
+
+
+                    <h3>
+
+                        {{ complaint.title }}
+
+                    </h3>
+
+
+                    <p>
+
+                        {{ complaint.description|truncatechars:100 }}
+
+                    </p>
+
+
+                    <small>
+
+                        📍
+                        {{ complaint.location|default:"Location not available" }}
+
+                    </small>
+
+
+                    <br>
+
+
+                    <small>
+
+                        🕒
+                        {{ complaint.created_at|date:"d M Y, h:i A" }}
+
+                    </small>
+
+
+                </div>
+
+
+
+                <!-- COMPLAINT META -->
+
+                <div class="complaint-meta">
+
+
+                    <!-- STATUS -->
+
+                    <span
+                        class="status status-{{ complaint.status|lower }}">
+
+                        {{ complaint.get_status_display }}
+
+                    </span>
+
+
+
+                    <!-- PRIORITY -->
+
+                    <span
+                        class="priority priority-{{ complaint.priority|lower }}">
+
+                        {{ complaint.get_priority_display }}
+
+                    </span>
+
+
+
+                    <!-- RESOLVED MESSAGE -->
+
+                    {% if complaint.status == "resolved" %}
+
+                        <small>
+
+                            ✅ Resolved by Administration
+
+                        </small>
+
+                    {% endif %}
+
+
+
+                    <!-- EMERGENCY MESSAGE -->
+
+                    {% if complaint.is_emergency %}
+
+                        <small class="emergency">
+
+                            🚨 Emergency (AI Flagged)
+
+                        </small>
+
+                    {% endif %}
+
+
+                </div>
+
+
+            </a>
+
+
+        {% endfor %}
+
+
+    </div>
+
+
+
+{% else %}
+
+
+    <!-- ========================= -->
+    <!-- EMPTY STATE -->
+    <!-- ========================= -->
+
+    <div class="empty-state">
+
+
+        <div class="empty-icon">
+
+            📝
+
+        </div>
+
+
+        <h3>
+
+            No complaints yet
+
+        </h3>
+
+
+        <p>
+
+            Report your first public issue.
+
+        </p>
+
+
+        <a
+            href="{% url 'create_complaint' %}"
+            class="btn primary">
+
+            Report Issue
+
+        </a>
+
+
+    </div>
+
+
+{% endif %}
+
+
+</section>
+
+{% endblock %}

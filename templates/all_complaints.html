@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}All Complaints{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+
+<h2>All Complaints</h2>
+<table>
+  <tr>
+    <th>ID</th>
+    <th>Title</th>
+    <th>Citizen</th>
+    <th>Category</th>
+    <th>Priority</th>
+    <th>Status</th>
+    <th>Emergency</th>
+    <th>Date</th>
+  </tr>
+  {% for complaint in complaints %}
+  <tr>
+    <td>#{{ complaint.id }}</td>
+    <td>{{ complaint.title }}</td>
+    <td>{{ complaint.citizen.username }}</td>
+    <td>{{ complaint.get_category_display }}</td>
+    <td>{{ complaint.get_priority_display }}</td>
+    <td>{{ complaint.get_status_display }}</td>
+    <td>{% if complaint.is_emergency %}🚨 Yes{% else %}No{% endif %}</td>
+    <td>{{ complaint.created_at }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

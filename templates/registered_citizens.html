@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Registered Citizens - JanSahayak AI
+{% endblock %}
+
+{% block content %}
+
+<link rel="stylesheet"
+      href="{% static 'css/dashboard.css' %}">
+
+<section class="dashboard">
+
+
+<!-- ========================= -->
+<!-- PAGE HEADER -->
+<!-- ========================= -->
+
+<div class="dashboard-header">
+
+    <div>
+
+        <div class="badge">
+            ADMIN PANEL
+        </div>
+
+        <h1>
+            Registered Citizens
+        </h1>
+
+        <p>
+            View all registered citizens in the JanSahayak AI system.
+        </p>
+
+    </div>
+
+
+    <a
+        href="{% url 'admin_dashboard' %}"
+        class="btn secondary">
+
+        ← Back to Admin Dashboard
+
+    </a>
+
+</div>
+
+
+
+<!-- ========================= -->
+<!-- CITIZENS TABLE -->
+<!-- ========================= -->
+
+{% if citizens %}
+
+    <div class="table-container">
+
+        <table class="data-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        #
+                    </th>
+
+                    <th>
+                        Username
+                    </th>
+
+                    <th>
+                        Email
+                    </th>
+
+                    <th>
+                        Phone
+                    </th>
+
+                    <th>
+                        Date Joined
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for citizen in citizens %}
+
+                    <tr>
+
+                        <td>
+                            {{ forloop.counter }}
+                        </td>
+
+
+                        <td>
+
+                            👤
+                            {{ citizen.user.username }}
+
+                        </td>
+
+
+                        <td>
+
+                            {{ citizen.user.email|default:"Not provided" }}
+
+                        </td>
+
+
+                        <td>
+
+                            {{ citizen.phone|default:"Not provided" }}
+
+                        </td>
+
+
+                        <td>
+
+                            {{ citizen.user.date_joined|date:"d M Y, h:i A" }}
+
+                        </td>
+
+
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+{% else %}
+
+
+    <!-- ========================= -->
+    <!-- EMPTY STATE -->
+    <!-- ========================= -->
+
+    <div class="empty-state">
+
+        <div class="empty-icon">
+            👥
+        </div>
+
+        <h3>
+            No Registered Citizens
+        </h3>
+
+        <p>
+            There are currently no registered citizens in the system.
+        </p>
+
+    </div>
+
+
+{% endif %}
+
+
+</section>
+
+{% endblock %}
